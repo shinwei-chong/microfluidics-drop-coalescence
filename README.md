@@ -5,7 +5,7 @@
 To develop a MATLAB-based tool for processing experimental videos containing droplet coalescence events to predict the droplet coalescence time.
 
 ## Contents
-The project repository will be split into the following parts:  
+The project repository will be split into the following parts (folders):  
 
 **1. video-processing**  
    - extract individual frames from video 
