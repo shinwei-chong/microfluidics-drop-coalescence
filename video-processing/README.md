@@ -20,7 +20,7 @@ This section focuses on processing raw experimental videos to prepare data for m
 + ***createVid.m***  
    Generate a new video from a folder of video frames. 
 
-## Main Scripts - completed scripts for deployment  
+## Main Scripts - complete scripts for deployment  
 + ***dropCropMULTI.m***  
    'Plug-and-play' script to process videos and generate cropped drop images (default dimensioins: 128x128 pix<sup>2</sup>) ready for machine learning model.  
 
