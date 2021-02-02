@@ -28,7 +28,9 @@ The project repository will be split into the following parts (folders):
 ## Data files  
 Some scripts, particularly the .mlx scripts, require data files/ folders to run.  
 Where possible, the data has been uploaded to the relevant sub-folders in this repository. However,
-some files/ folders are simply too large to be uploaded, so will have to be downloaded from [here](https://drive.google.com/drive/folders/1VXOg2uKROwx4l2nFKGY9KS2UDEXZLQVh?usp=sharing) instead. These will have been indicated in the relevant scripts.
+some files/ folders are simply too large to be uploaded, so will have to be downloaded from [here](https://drive.google.com/drive/folders/1VXOg2uKROwx4l2nFKGY9KS2UDEXZLQVh?usp=sharing) instead. These will have been indicated in the relevant scripts.  
+
+Troubleshooting: if the code fails to run, please check if the name of data files/ folders that are in your directory match that in the script.
    
    
    
