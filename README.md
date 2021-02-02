@@ -22,6 +22,12 @@ The project repository will be split into the following parts (folders):
      | ------------  | -----------  | ------------  | ---------- |  
    
    - query complete table to identify coalescing frame number and corresponding initial doublet frame
-   - compute coalescence time
+   - compute coalescence time  
+   
+## Data files  
+Some scripts, particularly the .mlx scripts, require data files/ folders to run.  
+Where possible, the data has been uploaded to the relevant sub-folders in this repository. However,
+some files/ folders are simply too large to be uploaded, so will have to be downloaded from [here](https://drive.google.com/file/d/1dftCLWLWgvBueI6TU3Cv4_7svssL3O34/view?usp=sharing) instead. These will have been indicated in the relevant scripts.
+   
    
    
