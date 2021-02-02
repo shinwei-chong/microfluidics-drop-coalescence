@@ -24,6 +24,9 @@ The project repository will be split into the following parts (folders):
    - query complete table to identify coalescing frame number and corresponding initial doublet frame
    - compute coalescence time  
    
+ 
+ _NOTE: the 'Obsolete' folder in the repo is just to provide a place to store my junk files. SWC._
+   
    
 ## Data files  
 Some scripts, particularly the .mlx scripts, require data files/ folders to run.  
