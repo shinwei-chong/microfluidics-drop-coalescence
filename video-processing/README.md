@@ -1,6 +1,11 @@
 # Part 1: Video Processing
 
-This section focuses on processing raw experimental videos to prepare data for machine learning classification model. 
+This section focuses on processing raw experimental videos to prepare data for machine learning classification model.  
+
+## Test Scripts  
++ ***preprocessing_workflow***  
+   Initial test of image processing steps on extracted video frames. 
+
 
 ## Main Scripts  
 + ***dropCropMULTI.m***  
