@@ -2,7 +2,7 @@
 % classification model. 
 
 % USER NOTES: 
-% 1)Script file should be in the folder along with all the videos (.avi
+% 1)Script file should be stored in the folder along with all the videos (.avi
 % format) intended to be processed.
 % 2)Just run script file and it should automatically do the job.
 % 3)Each video processed will output 2 new folders: 
@@ -13,27 +13,28 @@
 % 1) Extract individual frames from video (function:extractVidFrames)
 % 2) Obtain bounding box info on individual drops (function: Process4Crop)
 % 3) Crop images (function: imgCrop)
-% Note all functions all at the end of the script
+% Note that all functions are at the end of the script
 
 % DEFAULT PARAMETERS: 
-% 1) background image generation method: median pixel value of 200 frames
+% 1) background image generation method: median pixel value across 200 frames
 % 2) number of frames extracted from each video: ALL frames
 % 3) treshold value for binarisation: 0.2
 % 4) cropped image dimensions: 128x128 pixels
-% 5) minimum drop area: 1800 pix^2 (anything smaller will be treated as
-%   noise object
-% 6) leading edge of detection: x==140 (aims to only detect drops in main
+% 5) minimum area for region of interest (ROI) detection: 1800 pix^2 
+%    (anything smaller will be treated as noise object
+% 6) leading edge for ROI detection: x==140 (aims to only detect drops in main
 % flow channel)
 
 % Version 1.0. SWC, 29-Jan-2021.
+
 
 %% read all videos in the filepath
 
 vid_idx = dir('*.avi'); 
 
 %% Start of process
-for i = 1: numel(vid_idx) % loop through each video
-    tic
+for i = 1: numel(vid_idx) % loop through each video in directory
+    tic % start timer
   
     %% ===== load video =====
     vid_name = vid_idx(i).name; % get file name of video
@@ -63,7 +64,7 @@ for i = 1: numel(vid_idx) % loop through each video
     mkdir(frames_folder) %create sub-folder to store extracted frames
     addpath(frames_folder) 
     
-    nframes = totframes; %number of frames to extrac <---------- user-defined input!!
+    nframes = totframes; %number of frames to extract <---------- user-defined input!!
     
     % uses a custom function defined below..
     extractVidFrames(vid, totframes, nframes,frames_folder);
@@ -84,7 +85,7 @@ for i = 1: numel(vid_idx) % loop through each video
     leadEdge = 140; % <-------- user-defined input!!
         % so any objects positioned at x<140 will not be cropped
     
-    cropDim = [128 128]; %<-------- user-defined input!!
+    cropDim = [128 128]; %final image crop size <-------- user-defined input!!
 
 
     % access individual frames
@@ -101,12 +102,13 @@ for i = 1: numel(vid_idx) % loop through each video
         imgCrop(img, k, roiBbox, cropDim, crop_folder);
     end
     
-    toc 
+    toc % stop timer
 end
 
 
 
-%% function to extract video frames
+%% 
+
 function extractVidFrames(vid,nTot,nExtractframes,filepath)
 %Function to extract user-defined number of frames from input video 
 %and save the individual frames as .jpg in the defined path directory.
@@ -126,18 +128,18 @@ end
 end
 
 
-%% function to pre-process video frames and get info on bounding boxes
+%%
 function roiBbox = Process4Crop(readFrame, bg, t, minArea, leadEdge)
 % Function to pre-process individual video frame to detect ROIs ready for cropping. 
 % Output is a table containing the Bounding Box properties of all the ROIs detected in the user-defined image frame.
 % Workflow: background subtraction; tresholding & binarisation;
 % morphological close and fill; draw bounding box
 %
-%   readFrame: video frame that has been read using imread <uint8>
+%   readFrame: video frame that has been read using imread <VideoReader>
 %   bg: background image file name <var>
 %   t: treshold value (range: 0-1)<double>
 %   minArea: minimum pixel area to keep <double>
-%   leadEdge: x-coord of vertical edge of which drops to the right of the edge will be processed <double> 
+%   leadEdge: x-coord of entrance point to main flow channel <double> 
 
 
 %background subtraction (standard diff: background - video frame)
@@ -165,21 +167,23 @@ roiBbox = roi.BoundingBox;
 end
 
 
-%% function to crop images 
+%%
 function imgCrop(readFrame, frameNum, roiTable, cropSize, filePath)
 % function to crop individual region of interest from an input image based on tabulated 
 % poperties of the regions of interest (ROIs), obtained using regionprops function.
 % cropped image will resized to a user-defined dimension.
 
-% readFrame: video frame that has been read using imread <uint8>
-% frameNum: frame number <double>
-% roiTable: property tables of ROIs, must have 'Bounding Box' column <table>
-% cropSize: [width height] <double>
-% filePath: folder to save cropped images in <char>
+%   readFrame: video frame that has been read using imread <VideoReader>
+%   frameNum: frame number <double>
+%   roiTable: property tables of ROIs, must have 'Bounding Box' column <table>
+%   cropSize: [width height] <double>
+%   filePath: folder to save cropped images in <char>
 
 
 for i = 1: height(roiTable)
-    dim = max([roiTable(i,3:4)]); % this will be the 
+    
+    dim = max([roiTable(i,3:4)]); % find the larger value between width and height of bounding box
+    
     % x-coord of centroid of cropping region
     cx = roiTable(i,1) + roiTable(i,3)/2; 
     % y-coord of centroid of cropping region
@@ -189,8 +193,8 @@ for i = 1: height(roiTable)
     xmin = cx - dim/2;
     ymin = cy - dim/2; 
     
-    % crop region defined as [x-coord of bottom left point, y-coord of
-    % bottom left point, width, height]
+    % crop region defined as [x-coord of bottom left vertex, y-coord of
+    % bottom left vertex, width, height]
     Img = imcrop(readFrame, [xmin, ymin, dim, dim]);
     
     % resize cropped image
@@ -202,4 +206,3 @@ for i = 1: height(roiTable)
 end
 
 end
-    
