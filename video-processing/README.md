@@ -2,13 +2,27 @@
 
 This section focuses on processing raw experimental videos to prepare data for machine learning classification model.  
 
-## Test Scripts  
+## Test Scripts - contain notes and visualisation of processing steps  
 + ***preprocessing_workflow_InitialTEST.mlx***  
-   Initial test of image processing steps on extracted video frames. 
+   Initial test of image processing steps on (pre-)extracted video frames (image binarisation), then obtaining information on the bounding box of drops.    
 
++ ***labeldrops_TEST.mlx***  
+   Combine video frames extraction function with image processing workflow, so code can run directly given a user-input video. Final output is a video with bounding boxes overlaid onto the footage. 
 
-## Main Scripts  
+## Function Files - used in test scripts  
++ ***extractVidFrames.m***  
+   Extract and save video frames in a new folder
+
++ ***vidFramePreprocess.m***  
+   Process video frames to detect drops (ROIs). Bounding boxes are then overlaid onto original frames, 
+   which are then saved to a new folder.
+
++ ***createVid.m***  
+   Generate a new video from a folder of video frames. 
+
+## Main Scripts - completed scripts for deployment  
 + ***dropCropMULTI.m***  
-   'Plug-and-play' script to process videos. Each video processed will generate two output folders - 
-   one containing full extracted frames, 
-   the other containing individual cropped drop images (default dimensioins: 128x128 pix<sup>2</sup>) ready for machine learning model.
+   'Plug-and-play' script to process videos and generate cropped drop images (default dimensioins: 128x128 pix<sup>2</sup>) ready for machine learning model.  
+
++ ***bboxVis.m***  
+   'Plug-and-play' script to process videos and generate a new video with bounding boxes visualised.
