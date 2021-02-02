@@ -24,7 +24,7 @@ This section focuses on processing raw experimental videos to prepare data for m
 + ***dropCropMULTI.m***  
    'Plug-and-play' script to process videos and generate cropped drop images (default dimensioins: 128x128 pix<sup>2</sup>) ready for machine learning model.  
    Example output folder (naming convention: framenumber_dropnumber):  
-   ![Screenshot of dropCropMULTI output folder](https://drive.google.com/file/d/1NIE_mHDYfKwMYoeB8Z60xxdlIwrCD4TP)
+   <img src="https://drive.google.com/uc?export=view&id=1NIE_mHDYfKwMYoeB8Z60xxdlIwrCD4TP" width="716.5" height="512.5">
 
 + ***bboxVis.m***  
    'Plug-and-play' script to process videos and generate a new video with bounding boxes visualised.  
