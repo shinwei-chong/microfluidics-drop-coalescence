@@ -13,7 +13,7 @@ The project repository will be split into the following parts (folders):
    - automated drop image cropping (useful for generating data for machine learning model training)
    
 **2. drop-classification**  
-   - (WORK IN PROGRESS..)
+   - (WORK IN PROGRESS)
    
 **3. drop-tracking**  
    - tabulate a series of drop parameters for each drop in **all** frames. Proposed table format:  
@@ -21,8 +21,8 @@ The project repository will be split into the following parts (folders):
      | Frame Number  | Drop Number  | x-coordinate  | Drop Class |
      | ------------  | -----------  | ------------  | ---------- |  
    
-   - query complete table to identify coalescing frame number and corresponding initial doublet frame
-   - compute coalescence time  
+   - query complete table to identify coalescing frame number and corresponding initial doublet frame (WORK IN PROGRESS)  
+   - compute coalescence time  (WORK IN PROGRESS)  
    
  
  _NOTE: the 'Obsolete' folder in the repo is just to provide a place to store my junk files. SWC._
