@@ -3,10 +3,16 @@
 This section focuses on: 
 * tabulating relevant drop parameters required, then 
 * querying table to identify the coalescence frame and corresponding initial doublet formation frame. 
-* Finally, the coalescence time can be computed. 
+* Finally, the coalescence time can be computed.  
 
-## Main Script
-* ***droptracking_test.mlx*** 
+Proposed workflow (WORK IN PROGRESS):  
+<img src="https://drive.google.com/uc?export=view&id=1wcietq-Nsedbjzo2_QkUyTxgAUNwFn2U">
+
+
+
+## Test Script
+* ***droptracking_test.mlx***  
+   Test code for drop tracking. So far have tabulated drop parameters, next step is to write algorithm for 'backtracking' step.
    
 ## Associated Data Files    
 * ***1.jpg***  
