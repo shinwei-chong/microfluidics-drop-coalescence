@@ -7,7 +7,10 @@ This section focuses on processing raw experimental videos to prepare data for m
    Initial test of image processing steps on (pre-)extracted video frames (image binarisation), then obtaining information on the bounding box of drops.    
 
 + ***labeldrops_TEST.mlx***  
-   Combine video frames extraction function with image processing workflow, so code can run directly given a user-input video. Final output is a video with bounding boxes overlaid onto the footage. 
+   Combine video frames extraction function with image processing workflow, so code can run directly given a user-input video. Final output is a video with bounding boxes overlaid onto the footage.  
+
++ ***dropCrop_TEST.mlx***  
+   Shows step-by-step the processing and cropping of drop images. Also used as debugger.
 
 ## Function Files - used in test scripts  
 + ***extractVidFrames.m***  
