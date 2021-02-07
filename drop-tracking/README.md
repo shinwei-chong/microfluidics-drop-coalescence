@@ -23,8 +23,8 @@ Used for testing operation for full video. Folder contains **all** extracted fra
 NOTE: video too large to be uploaded so will need to be downloaded separately (available at Nina's shared drive)
 
 ## Associated Output Files
-* ***test001_datatable***  
-Data table exported from operation with full video (drop class labels randomly assigned at this stage, as not integrated with machine learning classification model yet)
-
 * ***test001_datatable_labelled***  
-Data table manually labelled with correct labels. Will be used to develop query algorithm
+Data table manually labelled with correct labels. From video: SO5_17umL-13Wat_umL-10kfps x4mag_sh50_C001H001S0016.avi
+
+* ***test002_Triton_datatable_labelled***  
+Data table manually labelled with correct labels. From video: SO5cSt 14uL_19 uL TRITON_ 50 mM 025.avi  
