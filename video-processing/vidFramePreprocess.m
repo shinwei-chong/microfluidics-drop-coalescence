@@ -1,4 +1,4 @@
-function vidFramePreprocess(filename, bg, t, minArea, leadEdge, foldername)
+function vidFramePreprocess(filename, bg, t, minArea, leadEdge, foldername,k)
 % Function to pre-process individual video frame and draw bounding boxes
 % over identified drops. Output is a lablled image which will be saved in a
 % user-defined directory.
@@ -17,7 +17,7 @@ function vidFramePreprocess(filename, bg, t, minArea, leadEdge, foldername)
 img = imread(filename); 
 
 %background subtraction (standard diff: background - video frame)
-sub_img = bg - img; 
+sub_img = rescale(abs(double(img) - double(bg))); 
 % figure; imshow(sub_img)
 
 %tresholding & binarisation
@@ -54,7 +54,7 @@ end
 hold off 
 
 % overwrite original video frame with labelled frame
-print(fullfile(foldername, filename), '-djpeg')
+print(fullfile(foldername, sprintf('%d.jpg',k)), '-djpeg')
 % saveas(f, fullfile(foldername,filename), 'jpeg'); 
 
 close(f)
