@@ -18,56 +18,108 @@ vid = VideoReader(vid_file);
 % create index of frames to be used for background generation operation
 idx = randperm(vid.NumFrames, n); % randomly select n unique frames 
 
-% first, find median pixel value across n randomly selected frames
-frameMat = uint8(zeros(vid.Height,vid.Width,n)); %initialise empty matrix 
-
 disp(['Processed video: ', vid_file])
 
+%% Original version
+% 
+% first, find median pixel value across n randomly selected frames
+% frameMat = uint8(zeros(vid.Height,vid.Width,n)); %initialise empty matrix 
+% tic;
+% 
+% for i = 1:n
+%     frame = read(vid, idx(i)); %read frame 
+%     frameMat(:,:,i) = frame; %add frame to matrix 
+% end 
+% 
+% bg = median(frameMat,3); %median
+% Imin = double(min(bg,[],'all')); %get min pixel value
+% Imax = double(max(bg,[],'all')); %get max pixel value
+% 
+% % then, iteratively reduce background noise
+% f = randperm(vid.NumFrames,n); % randomly select another n unique frames
+% 
+% Al2 = (245*(double(bg)-Imin))/(Imax-Imin) + 10;
+% R = bg;
+% 
+% for nf = 1:length(f)
+%     F = read(vid, f(nf));
+%     Fl2 = (245*(double(F)-Imin))/(Imax-Imin) + 10;
+%     
+%     D = 255.* Fl2 ./ Al2;
+%     D(Al2 <= 0 | Fl2 > Al2) = 255;
+%     D(Fl2 < 0) = 0;
+% %     D = mat2gray(D);
+%     D = rescale(D);
+%     
+%     B1 = imbinarize(D);
+%     B2 = imcomplement(B1);
+%     
+%     B2_fill = bwconvhull(B2,'object');
+% %     B2_fill = bwareaopen(B2_fill,800);
+%     A2 = regionprops('table',B2_fill,'BoundingBox');
+% %     se = strel('disk', round(0.3*min(A2.BoundingBox(:,3))));
+%     B2_dilate = imdilate(B2_fill,strel('disk',8));
+%     M2 = uint8(double(R).*double(B2_dilate));
+%     
+%     B1_dilate = imcomplement(B2_dilate);
+%     M1 = uint8(double(B1_dilate).*double(F));
+%     
+%     R = M1+M2;
+% end
+% 
+% toc;
+
+%% Adapted version
 tic;
+
+frameMat = uint8(zeros(vid.Height, vid.Width, 40)); %original
+frameMat2 = zeros(vid.Height, vid.Width, 40); %filtered
 
 for i = 1:n
     frame = read(vid, idx(i)); %read frame 
     frameMat(:,:,i) = frame; %add frame to matrix 
+    
+    adframe = imadjust(stdfilt(im2double(frame)));
+    frameMat2(:,:,i) = adframe; %add frame to matrix
 end 
 
-bg = median(frameMat,3); %median
-Imin = double(min(bg,[],'all')); %get min pixel value
-Imax = double(max(bg,[],'all')); %get max pixel value
+% initial background image
+bg = median(frameMat,3); 
+adbg = median(frameMat2,3);
+
+Imin = double(min(adbg,[],'all')); %get min pixel value
+Imax = double(max(adbg,[],'all')); %get max pixel value
 
 % then, iteratively reduce background noise
 f = randperm(vid.NumFrames,n); % randomly select another n unique frames
 
-Al2 = (245*(double(bg)-Imin))/(Imax-Imin) + 10;
 R = bg;
 
 for nf = 1:length(f)
     F = read(vid, f(nf));
-    Fl2 = (245*(double(F)-Imin))/(Imax-Imin) + 10;
+    adF = imadjust(stdfilt(im2double(F)));
     
-    D = 255.* Fl2 ./ Al2;
-    D(Al2 <= 0 | Fl2 > Al2) = 255;
-    D(Fl2 < 0) = 0;
-%     D = mat2gray(D);
-    D = rescale(D);
+    D = imadjust(imsubtract(adF,adbg));
+%     that = imtophat(D,strel('diamond',10));
+%     bhat = imbothat(D,strel('diamond',10));
+%     adD = D+that-bhat;
+%     adD(adD<0) = 0; 
+%     adD(adD>1) = 1;
     
     B1 = imbinarize(D);
-    B2 = imcomplement(B1);
+%     B2 = imcomplement(B1);
     
-    B2_fill = bwconvhull(B2,'object');
-%     B2_fill = bwareaopen(B2_fill,800);
-    A2 = regionprops('table',B2_fill,'BoundingBox');
-%     se = strel('disk', round(0.3*min(A2.BoundingBox(:,3))));
+    B2_fill = bwconvhull(B1,'object');
     B2_dilate = imdilate(B2_fill,strel('disk',8));
-    M2 = uint8(double(R).*double(B2_dilate));
+    M2 = uint8(double(B2_dilate).*double(R));
     
     B1_dilate = imcomplement(B2_dilate);
-    M1 = uint8(double(B1_dilate).*double(F));
+    M1 = uint8(double(F).*double(B1_dilate));
     
     R = M1+M2;
 end
 
 toc;
-
 
 end
 
