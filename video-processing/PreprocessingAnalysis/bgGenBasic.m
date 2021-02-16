@@ -11,6 +11,8 @@ function [med_bg mod_bg avg_bg] = bgGenBasic(vid_file,n)
 %   med_bg: background generated using median pixel value
 %   mod_bg: background generated using mode pixel value
 %   avg_bg: background generated using mean pixel value
+%
+%   Written by: SWC. V1.0, 14-Feb-2021.
 
 
 % read video 
