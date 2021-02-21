@@ -34,7 +34,7 @@
 %    Note: for vertical flows, change this to 0! Otherwise, all drops would
 %    be removed. 
 %   
-% 6) Crop size: 32x32 pix
+% 6) Crop size: 64x64 pix
 
 % Version 2.0. SWC, 21-Feb-2021.
 
@@ -136,7 +136,7 @@ for i = 1: numel(vid_idx) % loop through each video in directory
   
         %% ===== CROP IMAGES =====
         roiTable = roi.BoundingBox; % just want information on bounding boxes
-        cropDim = [32 32]; %final image crop size <-------- user-defined input!!
+        cropDim = [64 64]; %final image crop size <-------- user-defined input!!
         
         for z = 1: height(roiTable)
             dim = 1.4*max([roiTable(z,3:4)]); % this will be the width/ height of square cropped area
@@ -159,6 +159,9 @@ for i = 1: numel(vid_idx) % loop through each video in directory
             
             % save image
             imwrite(cropImg, [crop_folder,'\',int2str(k),'_',int2str(z),'.jpg']);
+            
+            % => UPDATE PROGRESS BAR
+            waitbar(k/len_acc_fold,pbar,sprintf('Frame %d of %d', [k len_acc_fold]));
         end
         
     end
