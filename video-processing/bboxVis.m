@@ -29,7 +29,7 @@
 % 6) leading edge for ROI detection: x==140 (aims to only detect drops in main
 % flow channel)
 
-% Version 1.0. SWC, 02-Feb-2021.
+% Version 2.0. SWC, 19-Feb-2021.
 
 
 %% read all videos in the filepath
@@ -42,176 +42,150 @@ for i = 1: numel(vid_idx) % loop through each video in directory
     
     %% ===== load video =====
     vid_name = vid_idx(i).name; % get file name of video
+    disp(['Processed video: ', vid_name])
+    
+    global vid totframes leadEdge
     vid = VideoReader(vid_name); % read video 
     totframes = vid.Numframes; %get total number of frames in video
     
     %% ===== background generation =====
-    n = 200; % number of frames to use for background generation  <-------- user-defined input!!
-    idx = round(linspace(1,totframes,n)); %vector of index of frame number to be extracted
-
-    frameMat = []; 
-
-    % for loop to create matrix of frames for generating background image
-    for j=1:numel(idx)
-        frame = read(vid,idx(j)); 
-        frameMat = cat(3,frameMat,frame);
-    end
+    disp('Generating background image...');
     
-    % compute median of each pixel across all frames in matrix
-    med_pix = median(frameMat,3);%<-------- user-defined input!!
- 
+    % ----- using basic statistical approach -----
+%     n = 150; % number of frames to use for background generation  <-------- user-defined input!!
+%     method = 'median'; % 'median' / 'mean' / 'mode' / 'all' <-------- user-defined input!!
+%     bg = bgGenBasic(n,method); %custom function
+    
+    % ----- using modified statistical approach -----
+    n = 40; % number of frames to use for background generation  <-------- user-defined input!!
+    method = 'modified'; % <-------- user-defined input!!
+    % 'original': WAT, DYE, TRI, SDS, 
+    % 'modified': C12Tab, TRI, SDS
+    bg = bgGenCmplx(n,method); %custom function
+
+    disp('Background image generation complete.')
+    
     %% ===== extract video frames & save in temporary folder =====
-    frames_folder = sprintf('extractedFrames_%d', i); %name of folder to store extracted frames
+    disp('Extracting individual frames from video...')
+    
+    frames_folder = ['FRAMES_', vid_name]; %name of folder to store extracted frames
     
     mkdir(frames_folder) %create sub-folder to store extracted frames
     addpath(frames_folder) 
     
     nframes = totframes; %number of frames to extract <---------- user-defined input!!
     
-    % uses a custom function defined below..
-    extractVidFrames(vid, totframes, nframes,frames_folder);
-    % inputs: [video file, total number of frames in video, number of
-    % frames to extract from video, folder to save extracted frames in]
-    
-    %% ===== Overlay video frames with bounding boxes =====
-    % create sub-folder to store labelled images 
-    framesBbox_folder = sprintf('framesBbox_%d', i); %name of folder to store extracted frames with bounding boxes visualised
-    mkdir(framesBbox_folder)
-    addpath(framesBbox_folder)
-    
-    % define custom function inputs 
-    t = 0.2; %treshold value  <-------- user-defined input!!
-    minArea = 1800; % <-------- user-defined input!!
-        % noise removal: drops less than this area will be excluded 
-    leadEdge = 140; % <-------- user-defined input!!
-        % so any objects positioned at x<140 will not be cropped
-    
-    % access individual frames
-    access_folder = dir([sprintf('extractedFrames_%d', i),'\*.jpg']);
-    
-    %loop through each frame in subfolder
-    for k = 1:numel(access_folder)
-        filename = fullfile(frames_folder,sprintf('%d.jpg',k));
-%         img = imread(filename); 
-    
-        vidFramePreprocess(filename, med_pix, t, minArea, leadEdge, framesBbox_folder, k);
+    idx = round(linspace(1,totframes, nframes)); %vector of index of frames to extract
+
+    for j=1:numel(idx)
+        frame = read(vid,idx(j));
+        imwrite(frame,[frames_folder,'\',int2str(idx(j)),'.jpg']);
     end
     
-    %% ===== Create new video =====
-    vidBbox_name = ['Bbox',vid_name]; %new video file name
-    labelled_vid = createVid(vidBbox_name, vid.FrameRate, framesBbox_folder, nframes);% <-------- user-defined input!!
-    % inputs: (name the file to be saved as, frame rate, name of folder 
-    % contaning frames to make new video, total number of frames in the folder)
+    disp('Frames extraction complete.')
+    
+    %% ===== Detect drops in each frame =====
+    disp('Start drop segmentation process...') 
+    % allow access to individual frames for processing
+    access_folder = dir([frames_folder,'\*.jpg']);
+    len_acc_fold = numel(access_folder); 
+    
+    % preallocate array to store movie frames
+%     F(len_acc_fold) = struct('cdata',[],'colormap',[]);
+    new_vid_name = ['Bbox_',vid_name]; %new video file name
+    new_vid = VideoWriter(new_vid_name); %create video object
+    new_vid.FrameRate = vid.FrameRate; %set frame rate
+    
+    open(new_vid); %open video file for writing
+
+    
+    % set up progress bar
+    pbar = waitbar(0,sprintf('Frame 1 of %d', len_acc_fold),'Name','Segmenting drops');  
+    
+    %loop through each frame in subfolder of extracted frames
+    for k = 1:len_acc_fold
+        filename = fullfile(frames_folder,sprintf('%d.jpg',k));
+        img = imread(filename); %read image
+        
+        %background subtraction 
+%         sub_img = rescale(1-(double(img) - double(bg))); %std diff + inversion.
+        sub_img = rescale(abs(double(img) - double(bg))); %abs diff (for C12Tab videos)
+%         figure; imshow(sub_img)
+        
+        %segment drops
+        mask = segDrop(sub_img); %custom function
+%         figure; imshow(mask)
+
+        %detect region of interest
+        roi = regionprops('table',mask);
+         % COMMENTED OUT: 20-Feb-2021. May lead to inaccurate estimation in some cases.     
+%         % estimate point of entrance to main channel - only have to do this
+%         % once.
+%         if k == 1
+%             roi(roi.Area < 800, :) = []; %remove small objects
+%             % first entry in ROI table is the drop nearest to left frame border
+%             leadEdge = roi.Centroid(1,1) + 1.4*(roi.BoundingBox(1,3) /2); 
+%         end 
+
+        
+        %remove data for any points out of main channel
+        leadEdge = 0;
+        roi(roi.Centroid(:,1) < leadEdge, :) =[]; 
+        %remove small objects
+        roi(roi.Area < 80, :) = [];
+        
+        %draw centroid and bounding box on frame
+        f = figure('visible', 'off'); % don't want to display plot when run code
+%         figure; 
+        imshow(filename); 
+        
+        hold on 
+
+        plot(roi.Centroid(:,1), roi.Centroid(:,2), 'b+'); %draw centroids
+        
+        for i=1:height(roi) %draw bounding boxes
+            rectangle('Position',roi.BoundingBox(i,:),'EdgeColor','b')
+        end
+        
+        hold off
+        
+        F = getframe(gcf); 
+        writeVideo(new_vid, F);
+        
+%         drawnow 
+        close(f);
+        
+        % update progress bar
+        waitbar(k/len_acc_fold,pbar,sprintf('Frame %d of %d', [k len_acc_fold]));
+    end
+    
+    disp('Drop segmentation process complete');
+    close(pbar)
+    
+    %% ===== write frames to create a new movie =====
+%     disp('Creating new movie...')
+    
+%     new_vid_name = ['Bbox_',vid_name]; %new video file name
+%     new_vid = VideoWriter(new_vid_name); %create video object
+%     new_vid.FrameRate = vid.FrameRate; %set frame rate
+    
+%     open(new_vid); %open video file for writing
+    
+    % loop to convert image to frame
+%     for h = 1:length(F)
+%         new_vid_frame = F(h); 
+%         writeVideo(new_vid, new_vid_frame); 
+%     end
+    
+    close(new_vid);
+
     
     toc % stop timer
+    
+    disp(['Processing for ', vid_name, ' complete.']);
+    disp('---------------------------------------');
     
 end
  
 
- %%    
-function extractVidFrames(vid,nTot,nExtractframes,filepath)
-%Function to extract user-defined number of frames from input video 
-%and save the individual frames as .jpg in the defined path directory.
-%   vid: video file that was read using VideoReader fucntion  <VideoReader>
-%   nTot: total number of frames in the video <double>
-%   nExtractframes: number of frames to extract <double> 
-%   filepath: path directory to save images in <char>
 
-
-idx = round(linspace(1,nTot, nExtractframes)); %vector of index of frames to extract
-
-for i=1:numel(idx) 
-    frame = read(vid,idx(i)); 
-    imwrite(frame,[filepath,'\',int2str(idx(i)),'.jpg']); 
-end
-
-end
-
-%%
-function vidFramePreprocess(filename, bg, t, minArea, leadEdge, foldername, k)
-% Function to pre-process individual video frame and draw bounding boxes
-% over identified drops. Output is a lablled image which will be saved in a
-% user-defined directory.
-%
-% Workflow: background subtraction -> tresholding & binarisation ->
-% morphological fill -> noise object removal -> draw bounding box
-%
-%   filename: 'video frame file name' <char>
-%   bg: background image file name <var>
-%   t: treshold value (range: 0-1)<double>
-%   minArea: minimum pixel area to keep <double>
-%   leadEdge: x-coordinate of point of entrance to main flow <double> 
-%   foldername: name of folder to save new video frames in 
-
-%read image 
-img = imread(filename); 
-
-%background subtraction (standard diff: background - video frame)
-sub_img = bg - img; 
-% figure; imshow(sub_img)
-
-%tresholding & binarisation
-bin_img = imbinarize(sub_img, t); 
-% figure; imshow(bin_img)
-
-%morphological fill 
-fill_img = bwconvhull(bin_img,'objects'); 
-% figure; imshow(fill_img)
-
-%remove noise objects
-cfill_img = bwareaopen(fill_img, minArea);
-
-%detect region of interest 
-roi = regionprops('table',cfill_img);
-roi(roi.Centroid(:,1) < leadEdge, :) =[]; %remove data for any points out of main channel
-
-% roi = regionprops(cfill_img,'centroid','BoundingBox'); 
-% centres = cat(1,roi.Centroid); 
-% box = cat(1,roi.BoundingBox); 
-
-%label drops on original video frame and save file 
-f = figure('visible', 'off'); % don't want to display plot when run code
-imshow(filename); 
-
-hold on 
-
-plot(roi.Centroid(:,1), roi.Centroid(:,2), 'b+'); %draw centroids
-
-for i=1:height(roi) %draw bounding boxes
-    rectangle('Position',roi.BoundingBox(i,:),'EdgeColor','b')
-end
-
-hold off 
-
-% save this as a new image
-print(fullfile(foldername, sprintf('%d.jpg',k)), '-djpeg')
-% saveas(f, fullfile(foldername,filename), 'jpeg'); 
-
-close(f)
-
-end
-
-%%
-function vid = createVid(vidname, fps, framesFolder, frameNum)
-% function to create video (.avi) from a folder containing image frames
-%
-%   vidname: output video file name <char>
-%   fps: frames per second <double>
-%   framesFolder: name of folder containing the extracted frames overlaid
-%   with bounding boxes <char>
-%   frameNum: total number of frames <double>
-
-vid = VideoWriter(vidname); %create video object
-vid.FrameRate = fps; % set frame rate
-
-open(vid); %open the video file for writing 
-
-for i = 1:frameNum
-    file_name = fullfile(framesFolder,sprintf('%d.jpg', i));
-    I = imread(file_name); %read image 
-    writeVideo(vid, I); %write image to file
-end
-
-close(vid); %close file
-
-end
