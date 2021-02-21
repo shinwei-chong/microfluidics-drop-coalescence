@@ -19,7 +19,8 @@ function [med_bg mod_bg avg_bg] = bgGenBasic(vid_file,n)
 vid = VideoReader(vid_file); 
 
 % create index of frames to be used for background generation operation
-idx = randperm(vid.NumFrames, n); % randomly select n unique frames 
+% idx = randperm(vid.NumFrames, n); % randomly select n unique frames 
+idx = round(linspace(1,vid.NumFrames,n)); % select n linearly spaced frames
 
 % combine frames pixel values in a 3-D matrix
 frameMat = uint8(zeros(vid.Height,vid.Width,n)); %initialise empty matrix 

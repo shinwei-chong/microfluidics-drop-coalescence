@@ -9,7 +9,7 @@ function R = bgGenCmplx(vid_file,n,method)
 %   Suitable for: TRI, SDS, DYE.
 %   ii) Modified version: Better detection for movies with varying
 %   contrast/ brightness across frame. 
-%   Recommended for: C12Tab, DYE.
+%   Recommended for: C12Tab.
 %   Suitable for: WAT, TRI, SDS.
 %
 %   ----- Input -----
@@ -27,7 +27,6 @@ function R = bgGenCmplx(vid_file,n,method)
 %   Microfluid Nanofluid.
 
 %   Written by: SWC. V1.2, 17-Feb-2021.
-
 %%
 
 % read video 
@@ -65,8 +64,8 @@ switch method
         Imax = double(max(bg,[],'all')); %get max pixel value
 
         % --- then, iteratively reduce background noise
-%         f = randperm(vid.NumFrames,3*n); % randomly select another n unique frames
-        f = round(linspace(1,vid.NumFrames,n)); % choose linearly spaced frames
+        f = randperm(vid.NumFrames,3*n); % randomly select another n unique frames
+%         f = round(linspace(1,vid.NumFrames,n)); % choose linearly spaced frames
 
         Al2 = (245*(double(bg)-Imin))/(Imax-Imin) + 10; 
         R = bg; %background image
@@ -144,7 +143,7 @@ switch method
         % ----- then, iteratively reduce background noise
         f = randperm(vid.NumFrames,n); % randomly select another n unique frames
 %         f = round(linspace(1,vid.NumFrames,n)); % choose linearly spaced
-%         frames. Note2self: check how quality changes between both!!
+%         frames. 
         
         R = bg;%initial background
 
