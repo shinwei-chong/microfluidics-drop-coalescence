@@ -47,7 +47,7 @@ switch method
     %  compared to 'basic' statistical methods.
     %  NOT suitable for C12Tab
         
-        disp('Using standard algorithm...'); 
+        disp('Using complex method - standard algorithm...'); 
     
         % --- first, find median pixel value across n randomly selected frames
         frameMat = uint8(zeros(vid.Height,vid.Width,n)); %initialise empty matrix 
@@ -118,7 +118,7 @@ switch method
     % Mixed results for TRI & SDS videos --> further evaluation required.
 
         
-        disp('Using modified algorithm...'); 
+        disp('Using complex method - modified algorithm...'); 
         
         frameMat = uint8(zeros(vid.Height, vid.Width, n)); %original
         frameMat2 = zeros(vid.Height, vid.Width, n); %filtered

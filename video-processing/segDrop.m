@@ -16,14 +16,14 @@ function L = segDrop(Im)
 
 %%
 % ----- binarize image -----
-% adIm = imadjust(Im); %saturate image
-% bin  = imbinarize(adIm, graythresh(Im)); % binarize using threshold from Otsu's method
+adIm = imadjust(Im); %saturate image
+bin  = imbinarize(adIm, graythresh(Im)); % binarize using threshold from Otsu's method
 % figure; imshow(bin); 
 
-% FOR C12Tab videos use this: 
-adIm = imadjust(stdfilt(Im)); %filter + saturate image
-thresh = graythresh(Im); %get threshold value using Otsu method 
-bin = imbinarize(adIm, 0.75*thresh); %convert to binary image
+% !!! FOR C12Tab videos use this: 
+% adIm = imadjust(stdfilt(Im)); %filter + saturate image
+% thresh = graythresh(Im); %get threshold value using Otsu method 
+% bin = imbinarize(adIm, 0.75*thresh); %convert to binary image
 
 %% COMMENTED OUT: 20-Feb-2021. alternative approach to binarisation --> but output image not as 'sharp'
 % Aa = imfilter(Im,fspecial('disk',8));

@@ -73,7 +73,7 @@ for i = 1: numel(vid_idx) % loop through each video in directory
     %% ===== extract video frames & save in temporary folder =====
     disp('Extracting individual frames from video...')
     
-    frames_folder = ['FRAMES_', vid_name]; %name of folder to store extracted frames
+    frames_folder = ['FRAMES_', vid_name(1:end-4)]; %name of folder to store extracted frames
     
     mkdir(frames_folder) %create sub-folder to store extracted frames
     addpath(frames_folder) 
@@ -140,7 +140,7 @@ for i = 1: numel(vid_idx) % loop through each video in directory
 %%
 
         % remove data for any points out of main channel
-        leadEdge = 100;
+        leadEdge = 100; % <----- user-defined input!!
         roi(roi.Centroid(:,1) < leadEdge, :) =[]; 
         %remove small objects
         roi(roi.Area < 80, :) = [];
