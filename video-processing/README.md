@@ -11,7 +11,7 @@ This section focuses on processing raw experimental videos to prepare data for m
    Example output [here](https://drive.google.com/file/d/1jf9_tMAYZ_aVIAc4yB-KxjehLqjHWsHe/view?usp=sharing).  
    Output from processing a series of test cases (videos of drops with different surfactant types found in zipped folders on GoogleDrive [here](https://drive.google.com/drive/folders/1VXOg2uKROwx4l2nFKGY9KS2UDEXZLQVh?usp=sharing)
 
-## Function Files - used in test scripts  
+## Function Files   
 + ***bgGenBasic.m***  
    Generate background image based on basic statistical approach (median/ mode/ mean)  
    
