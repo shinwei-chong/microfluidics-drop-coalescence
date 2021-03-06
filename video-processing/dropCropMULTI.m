@@ -6,7 +6,9 @@
 %   (.avi format) intended to be processed.
 % 2)Each video processed will output:
 %    - folder containing original extracted frames 
-%    - video file with bounding boxes visualised
+%    - folder containing individual cropped drop image
+%    - excel spreadsheet with tabulated drop properties (needed to compute
+%    coalescence time)
 %
 % HIGH-LEVEL WORKFLOW: 
 % 1) Extract individual frames from video 
@@ -34,9 +36,9 @@
 %    Note: for vertical flows, change this to 0! Otherwise, all drops would
 %    be removed. 
 %   
-% 6) Crop size: 64x64 pix
+% 6) Crop size: 128x128 pix
 
-% Version 2.0. SWC, 21-Feb-2021.
+% Version 2.1. SWC, 06-Mar-2021.
 
 
 %% read all videos in the filepath
@@ -106,6 +108,12 @@ for i = 1: numel(vid_idx) % loop through each video in directory
     % => SET UP PROGRESS BAR
     pbar = waitbar(0,sprintf('Frame 1 of %d', len_acc_fold),'Name','Cropping drop images');
     
+    % => create empty table to store drop properties
+    % column names: frame number, drop number, centroid x-coord
+    headers = {'Frame#' 'Drop#' 'xCentroid' 'yCentroid'}; 
+    varTypes = {'double' 'double' 'double' 'double'}; % formalities - need to tell MATLAB what the expected data class type would be. All numbers (doubles) in this case
+    T = table('Size',[0 4],'VariableTypes',varTypes,'VariableNames',headers);
+    
     for k = 1:len_acc_fold %loop through each frame
         filename = fullfile(frames_folder,sprintf('%d.jpg',k)); %get file name
         img = imread(filename); %read image
@@ -134,13 +142,24 @@ for i = 1: numel(vid_idx) % loop through each video in directory
         %remove small objects
         roi(roi.Area < 80, :) = [];
   
+        %% ===== GENERATE DROP PROPERTIES TABLE =====
+        % collect data from the processed frame for table
+        data = table(k*ones(height(roi),1),...
+        [1:height(roi)]',...
+        roi.Centroid(:,1),...
+        roi.Centroid(:,2),...
+        'VariableNames', headers);
+    
+        % add data to table 
+        T = vertcat(T,data);
+        
         %% ===== CROP IMAGES =====
         roiTable = roi.BoundingBox; % just want information on bounding boxes
-        cropDim = [64 64]; %final image crop size <-------- user-defined input!!
+        cropDim = [128 128]; %final image crop size <-------- user-defined input!!
         
         for z = 1: height(roiTable)
-            dim = 1.4*max([roiTable(z,3:4)]); % this will be the width/ height of square cropped area
-            
+%             dim = 1.4*max([roiTable(z,3:4)]); % this will be the width/ height of square cropped area
+            dim = max([roiTable(z,3:4)]); %NOTE (06-Mar-2021): this seems to give better results for ML classification
             % x-coord of centroid of cropping region
             cx = roiTable(z,1) + roiTable(z,3)/2;
             % y-coord of centroid of cropping region
@@ -164,8 +183,18 @@ for i = 1: numel(vid_idx) % loop through each video in directory
             waitbar(k/len_acc_fold,pbar,sprintf('Frame %d of %d', [k len_acc_fold]));
         end
         
+        
     end
     
+    % => save drop properties table as excel spreadsheet
+    writetable(T, [vid_name(1:end-4), '_PP.xlsx']);
+    
     toc % stop timer
+    
+    
+    close(pbar)
+    
+    disp(['Processing for ', vid_name, ' complete.']);
+    disp('---------------------------------------');
     
 end
