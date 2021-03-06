@@ -5,35 +5,28 @@
 To develop a MATLAB-based tool for processing experimental videos containing droplet coalescence events to predict the droplet coalescence time.
 
 ## Contents
-The project repository will be split into the following parts (folders):  
+The project repository is split into the following parts (folders):  
 
 **1. video-processing**  
    - extract individual frames from video 
    - image processing and drop detection
-   - automated drop image cropping (useful for generating data for machine learning model training)
+   - crop drop images 
+   - exports a spreadsheet containing drop properties required for computing coalescence time
    
 **2. drop-classification**  
-   - (WORK IN PROGRESS)
+   - training image dataset was increased by performing data augmentation
+   - trained SVM and CNN models 
+   - CNN model used to classify drop image as one of singlet, doublet or coalesced
+   - exports a spreadhseet containing predicted class label for each drop
    
 **3. drop-tracking**  
-   - tabulate a series of drop parameters for each drop in **all** frames. Proposed table format:  
+   - tabulated data containing the following columns is required:
    
-     | Frame Number  | Drop Number  | x-coordinate  | Drop Class |
-     | ------------  | -----------  | ------------  | ---------- |  
+     | Frame Number  | Drop Number  | centroid x-coordinate | centroid y-coordinate  | Drop Class |
+      -----  | -----------  | ------------  | ---------- | ---------- |  
    
-   - query complete table to identify coalescing frame number and corresponding initial doublet frame (WORK IN PROGRESS)  
-   - compute coalescence time  (WORK IN PROGRESS)  
+   - query table to identify coalescing frame number and corresponding initial doublet frame 
+   - compute coalescence time   
    
  
- _NOTE: the 'Obsolete' folder in the repo is just to provide a place to store my junk files. SWC._
-   
-   
-## Data files  
-Some scripts, particularly the .mlx scripts, require data files/ folders to run.  
-Where possible, the data has been uploaded to the relevant sub-folders in this repository. However,
-some files/ folders are simply too large to be uploaded, so will have to be downloaded from [here](https://drive.google.com/drive/folders/1VXOg2uKROwx4l2nFKGY9KS2UDEXZLQVh?usp=sharing) instead. These will have been indicated in the relevant scripts.  
-
-Troubleshooting: if the code fails to run, please check if the name of data files/ folders that are in your directory match that in the script.
-   
-   
    
