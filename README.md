@@ -22,8 +22,9 @@ The project repository is split into the following parts (folders):
 **3. drop-tracking**  
    - tabulated data containing the following columns is required:
    
-     | Frame Number  | Drop Number  | centroid x-coordinate | centroid y-coordinate  | Drop Class |
-      -----  | -----------  | ------------  | ---------- | ---------- |  
+     | Frame Number  | Drop Number  | centroid x-coordinate | centroid y-coordinate  | Drop Class |  
+     | ------------  | -----------  | --------------------  | ---------------------- | ---------- |  
+     
    
    - query table to identify coalescing frame number and corresponding initial doublet frame 
    - compute coalescence time   
