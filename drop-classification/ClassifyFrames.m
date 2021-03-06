@@ -1,8 +1,6 @@
-
-clc;
-
-
 access_folder = dir([sprintf('cropImg_16'),'\*.jpg']);
+
+
 
 imagename = zeros(numel(access_folder));
 
@@ -14,13 +12,15 @@ end
 
 name = imgname.';
 
-labelIdx = predict(classifier,imageDatastore('cropImg_16'));
+% labelIdx = predict(classifier,imageDatastore('cropImg_16'));
 
-% for i = 1:numel(access_folder)
-%      frame = imread(access_folder(i).name);
+for i = 1:numel(access_folder)
+    str = [access_folder(i).folder, "\", access_folder(i).name];
+    framepath = join(str, "");
+    frame = imresize(imread(framepath), [28 28]);
 %      labelIdx(i) = predict(classifier, frame);
-%      labelIdx(i) = classify(net, frame);
-% end
+     labelIdx(i) = classify(net, frame);
+end
 
 labels = labelIdx.';
 
@@ -28,5 +28,5 @@ labels = labelIdx.';
 
 
 
-%[labelIdx, score] = predict(classifier, frames);
+% [labelIdx, score] = predict(classifier, frames);
 
