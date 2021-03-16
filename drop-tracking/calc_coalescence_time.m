@@ -17,7 +17,8 @@ function calc_coalescence_time()
 %   predicted drop class. Then, will need to manually combine both
 %   spreadsheet to be used with this function file.
 % 3)Frame rate (fps) needs to be manually defined - variable is found towards end of script
-%   Default value: 30 fps 
+%   Default value: 10000 fps (framerate of high speed imaging camera used
+%   in experiments)
 %
 %
 % HIGH-LEVEL WORKFLOW: 
@@ -27,10 +28,10 @@ function calc_coalescence_time()
 %   which coalescence is detected, map back to previous frames and stop when
 %   drop is identified as a singlet. 
 %   Underpinning principle: coalesced drops must have previously been a
-%   doublet, which were in turn formed from single drops.
+%   doublet, which were in turn formed from (two) single drops.
 
 
-% Written by: SWChong, 06-Mar-2021. V1.1 
+% Written by: SWChong, 16-Mar-2021. V1.2 
 
 %% read all .xlsx files in the filepath
 
@@ -51,10 +52,10 @@ for i = 1: numel(xcel_idx) %loop through each excel spreadsheet in directory
 %     size(tab) %%%troubleshoot: print table size
 
     %% ===== find 'coalescing' drops (predicted class == 1) =====
-    pos = find(tab.Class == 1); %NOTE:column must be named 'Class'
+    pos = find(tab.Class == 1); %NOTE:column in spreadsheet must be named 'Class'
     
     %%||- GATE -||: stop code if no coalesced drops found
-    if pos == [];
+    if isempty(pos);
         disp('No coalescence event found!'); 
         continue 
     end
@@ -63,7 +64,9 @@ for i = 1: numel(xcel_idx) %loop through each excel spreadsheet in directory
     coal_drops = tab(pos,:); 
     
     %% ===== separate the different coalescence events =====
-    % for when there are multiple coalescence events identified in a video
+    % As typically there are multiple coalescence events identified in a
+    % video; even though some will be false positive events
+    
     
     % calculate euclidean distance of drops between frames 
     centroidVec = [coal_drops.xCentroid coal_drops.yCentroid];
@@ -72,8 +75,8 @@ for i = 1: numel(xcel_idx) %loop through each excel spreadsheet in directory
     
     % find index to split table (into separate coalescence events)
     % by inspection, a drop travels less than 1 pix per frame
-    uniq_idx = find(euclid_dist > 2); %RUN MORE TESTS IF HAVE TIME: is this robust enough?
-    uniq_idx = [1 uniq_idx+1]; %manipulation step (prep for for loop)
+    uniq_idx = find(euclid_dist > 2); %RUN MORE TESTS IF HAVE TIME: is this criterion robust enough?
+    uniq_idx = [1; uniq_idx+1]; %manipulation step (prep for for loop)
     numUniq = length(uniq_idx); %number of unique coalescence events
     
     uniq_coal = cell(numUniq,1); %preallocate dimensions 
@@ -175,13 +178,26 @@ for i = 1: numel(xcel_idx) %loop through each excel spreadsheet in directory
             z = z+1; %increase counter
             
             
+            %%||- GATE - ||: Make sure it is a 'true' coalescence event 
+            % drop cannot go from doublet back to coalesced in the earlier frames.
+            if drop_class{k}(end) == 1  
+                disp('This might be a false coalescence event - not analysed');
+                break
+            end
+            
         end
+        
+        % need this to properly implement previous gate
+        if drop_class{k}(end) == 1
+            continue
+        end
+        
         
         if frame{k}(end) >= 1
             doublet_formation_frame = frame{k}(end) + 1 
             
         %%===== calculate coalescence time =====
-            framerate = 30; %<------- user-defined value
+            framerate = 10000; %<------- user-defined value
             coalescence_time = (coalescence_frame - doublet_formation_frame)/ framerate
             
             full_search_table = array2table([frame{k}' coord{k} drop_class{k}'],...
