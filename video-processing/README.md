@@ -4,7 +4,7 @@ This section focuses on processing raw experimental videos to prepare data for m
 
 ## Main Scripts   
 + ***dropCropMULTI.m***  
-   Script to process videos and generate cropped drop images (default dimensioins: 128128 pix<sup>2</sup>) as input to machine learning model.  
+   Script to process videos and generate cropped drop images (default dimensioins: 128x128 pix<sup>2</sup>) as input to machine learning model.  
 
 + ***bboxVis.m***  
    Script to process videos and generate a new video with bounding boxes visualised.  
