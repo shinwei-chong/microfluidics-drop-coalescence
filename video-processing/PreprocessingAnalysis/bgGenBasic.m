@@ -50,6 +50,7 @@ avg_bg = mean(frameMat,3,'native'); % mean
 tEnd3 = toc; 
 disp(sprintf('Mean; Elapsed time = %.2f', tEnd+tEnd3))
 
+
 % display images
 % figure; imshow(med_bg); title('median')
 % figure; imshow(mod_bg); title('mode')
