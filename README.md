@@ -4,6 +4,10 @@
 ## Aim
 To develop a MATLAB-based tool for processing experimental videos containing drop coalescence events to predict the drop coalescence time.
 
+![coalescence_time_illustration](https://user-images.githubusercontent.com/70296319/112756579-d04a3280-8fdd-11eb-8806-c54b0c225598.JPG)
+
+
+
 ## Contents
 The project repository is split into the following parts:  
 
