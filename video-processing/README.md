@@ -1,6 +1,20 @@
 # Part 1: Video Processing
 
-This section focuses on processing raw experimental videos to prepare data for machine learning classification model.  
+## Summary  
+This section focuses on processing raw experimental videos to prepare data for machine learning classification model, and consists of 2 main steps:  
+* extracting individual video frames from an input video   
+* applying a series of image processing steps to each frame to detect and crop drops  
+
+Sequence of image processing steps (where multiple options are possible in a given step, the default option is highlighted by the red dotted lines):  
+A) start by loading an original video frame image to be processed  
+B) a background image is pre-generated using a numnber of frames across the video  
+C) the background image is subtracted from the original video frame  
+D) the image is converted into a binary image  
+E) a series of mathematical morphological operations are performed to create a binary mask indicating the area of the drops  
+F) the drops are detected using computer vision methods and their centroid and bounding drop properties are obtained; these will be used to define the crop area of the drops  
+
+![image_processing_workflow](https://user-images.githubusercontent.com/70296319/112761178-ea8e0b80-8ff1-11eb-8220-24f702797875.JPG)
+
 
 ## Main Scripts   
 + ***dropCropMULTI.m***  
