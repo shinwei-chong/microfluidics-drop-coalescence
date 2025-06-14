@@ -1,5 +1,6 @@
 # Estimating Drop Coalescence Time in Microfluidics
-2020/21 MEng Research Project
+2021 MEng Research Project. University of Birmingham, School of Chemical Engineering
+Authored by: Shin Wei Chong
 
 ## Aim
 To develop a MATLAB-based tool for processing experimental videos containing drop coalescence events to predict the drop coalescence time.
