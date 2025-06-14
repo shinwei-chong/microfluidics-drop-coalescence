@@ -1,5 +1,6 @@
 # Estimating Drop Coalescence Time in Microfluidics
-2021 MEng Research Project. University of Birmingham, School of Chemical Engineering
+2021 MEng Research Project.  
+University of Birmingham, School of Chemical Engineering  
 Authored by: Shin Wei Chong
 
 ## Aim
